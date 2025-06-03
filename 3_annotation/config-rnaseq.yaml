@@ -1,0 +1,39 @@
+# path or URL to sequencing unit sheet (TSV format, columns: sample, unit, fq1, fq2)
+# Units are technical replicates (e.g., lanes or resequencing of the same biological
+# sample).
+units: "rnaseq-units.tsv"
+# units: "rnaseq-units-toy.tsv"
+# units: "rnaseq-units.tsv"
+genome: "ref/RP_tetra_homcov140_purged.p_ctg.fasta"
+# genome: "ref/RP_tetra.p_ctg.fa"
+# genome: "ref/PI310467.asm.bp.p_ctg.fa"
+# intervals: "ref/PI310467-hifiasm-100k.bed"
+# genome: "ref/utg000001l.fa"
+# intervals: "ref/utg000001l-100k.bed"
+
+final_samples: []
+
+# sequencing adapter
+adapter: AGATCGGAAGAGC
+
+params:
+
+    align:
+        threads: 12
+        sort_mem: 4G
+    
+    cutadapt-pe:
+        qual: "10"
+        minlength: 40
+        threads: 12
+    
+    hisat2:
+        threads: 12
+        etc: "--max-intronlen 20000"
+    
+    mark_duplicates:
+        jarpath: "/share/comailab/kramundson/miniconda3/envs/ximena/share/picard-2.18.27-0/picard.jar"
+        java_heap: "-Xms512m -Xmx4g -XX:ParallelGCThreads=1 -Djava.io.tmpdir=."
+        opt: "REMOVE_DUPLICATES=true TMP_DIR=./tmp ASSUME_SORT_ORDER=coordinate MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000"
+        threads: 2
+        

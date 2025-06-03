@@ -1,0 +1,4 @@
+sample	unit	fq1	fq2	readlen	read_type
+PI310467	m64069_211118_031642	m64069_211118_031642.hifi_reads.fastq.gz	NaN long	FALSE	FALSE
+PI310467	m64069_211125_193709	m64069_211125_193709.hifi_reads.fastq.gz	NaN long	FALSE	FALSE
+PI310467	m84066_230512_192902	m84066_230512_192902_s4.hifi_reads.default.fastq.gz	NaN	long

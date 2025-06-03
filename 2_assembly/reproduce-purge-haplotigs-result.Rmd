@@ -1,0 +1,99 @@
+---
+title: "cov stats"
+output: html_notebook
+---
+
+```{r}
+gencov <- read_tsv("~/Desktop/Comai_Lab/github-repositories/layer/analysis/purge_haplotigs/PI310467.bam.gencov",
+                   col_names = F) 
+head(gencov)
+```
+
+```{r}
+old_gencov <- read_tsv("~/Desktop/Comai_Lab/github-repositories/layer/analysis/purge_haplotigs/old_PI310467.bam.gencov",
+                       col_names = F)
+head(old_gencov)
+```
+
+```{r}
+gencov %>% 
+  dplyr::rename(nb = X3) %>% 
+  left_join(., old_gencov, by = c("X1", "X2")) %>% 
+  mutate(nb_same = nb == X3) %>% 
+  # filter(!nb_same)
+  group_by(nb_same) %>% tally
+```
+
+> gencov is congruent, so this is not the issue.
+Then, the problem arises with where I set my cutoffs.
+I don't have that information handy here. 
+
+```{r}
+gencov %>% 
+  group_by(X2) %>% 
+  summarize(n_bases = sum(X3)) %>% 
+  ungroup() %>% 
+  ggplot(., aes(x=X2, y = n_bases)) +
+  geom_bar(stat = "identity") +
+  geom_vline(xintercept = c(15, 25, 190)) +
+  coord_cartesian(xlim = c(0, 250))
+```
+
+```{r}
+old_stats_file <- "~/Desktop/Comai_Lab/github-repositories/layer/analysis/purge_haplotigs/coverage_stats.csv"
+old_stats_header <- system(paste0("grep '^#' ", old_stats_file), intern = T) %>% 
+  str_remove("^#") %>% 
+  str_split(pattern = ",") %>% 
+  pluck(1)
+old_stats <- read_csv(old_stats_file,
+                      col_names = old_stats_header,
+                      comment = "#")
+head(old_stats)
+```
+
+```{r}
+new_stats_file <- "~/Desktop/Comai_Lab/github-repositories/layer/analysis/purge_haplotigs/2025_coverage_stats.csv"
+new_stats_header <- system(paste0("grep '^#' ", new_stats_file), intern = T) %>% 
+  str_remove("^#") %>% 
+  str_split(pattern = ",") %>% 
+  pluck(1)
+new_stats <- read_csv(new_stats_file,
+                      col_names = new_stats_header,
+                      comment = "#")
+head(new_stats)
+```
+
+> These numbers are slightly different and I don't know why
+
+```{r}
+nrow(old_stats)
+nrow(new_stats)
+```
+
+> Neither the fai file of the old or new coverage stats matches the contig number of the .fai file for the initial assembly.
+This is so weird. More trouble. FAI has 2,474 contigs in it. This is what I used for the mapping and mutation calling for the paper.
+What did I use for the purge long read mapping? Also has 2,474 contigs in it.
+/scratch/kramundson/RP_hifiasm/data/reads/RP_tetra_homcov140_l3/RP_tetra_homcov140.p_ctg.fa has 2,474 contigs in it.
+Check the bam header of the long read alignments - should have 2,474 contigs in it. It does.
+If so, this means the table that was used to generate the coverage_stats.csv used for purging was of a different assembly.
+Could be that the gencov file was from an outdated genome? It wasn't.
+
+```{r}
+old_stats %>% 
+  select(contig, bases_all) %>% 
+  dplyr::rename(bases_all_old = bases_all) %>% 
+  full_join(.,
+            new_stats %>% select(contig, bases_all),
+            by = "contig") %>% 
+  dplyr::rename(bases_all_new = bases_all) %>% 
+  mutate(bases_eq = bases_all_new == bases_all_old,
+         delta = bases_all_new - bases_all_old) %>% 
+  View
+```
+
+> Coverage stats files seem to be from different assembly versions.
+Slightly different numbers of contigs too. Trouble.
+
+```{r}
+# this means I can't reproduce the coverage stats file or the assembly with the data I currently have
+```

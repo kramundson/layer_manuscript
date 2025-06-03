@@ -1,0 +1,13 @@
+rule window_read_depth:
+    input:
+        bam="data/merged/{sample}.bam",
+        bins="ref/DMv6_chloro_mito_10k.bed"
+    output:
+        "data/read_depth/{sample}.tsv"
+    log:
+    params: "-Q 20"
+    shell: """
+        samtools depth -a {params} {input.bam} | \
+        awk -v OFS="\t" '{{print $1, $2-1, $2, $3}} | \
+        bedtools map -c 4 -o mean,median -a {input.bins} -b stdin > {output}
+    """

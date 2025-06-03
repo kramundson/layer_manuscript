@@ -1,0 +1,32 @@
+rule map_long:
+    input:
+        reads=get_long,
+        asm=config["genome"]
+    output:
+        "data/aligned_long/{sample}-{unit}.raw.bam"
+    log:
+        "log/minimap2/{sample}-{unit}.log"
+    threads:
+        config["params"]["pbmm2"]["threads"]
+    conda:
+        "../env/pbmm2.yml"
+    params:
+        rg="'@RG\\tID:{unit}\\tSM:{sample}'",
+        preset=config["params"]["pbmm2"]["preset"],
+        aln_threads=3*config["params"]["pbmm2"]["threads"] // 4,
+        sort_threads=config["params"]["pbmm2"]["threads"] // 4
+    shell: """
+        pbmm2 align \
+            {params.preset} \
+            -j {params.aln_threads} \
+            -J {params.sort_threads} \
+            {input.asm} \
+            {input.reads} \
+            {output[0]} \
+            > {log} 2>&1
+    """
+    #shell: """
+    #    module load minimap2 2> {log}
+    #    minimap2 -R {params.rg} -t {threads} -ax map-hifi {input.asm} {input.reads} 2> {log} | samtools sort -@ {threads} -o {output[0]} - 2>> {log}
+    #    samtools view -q 1 -F 3840 -b {output[0]} > {output[1]}
+    #"""

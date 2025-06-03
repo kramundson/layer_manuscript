@@ -1,0 +1,11 @@
+rule histogram_mq:
+    input:
+        "data/merged/{sample}.bam"
+    output:
+        "data/mq_hist/{sample}_mq_hist.txt"
+    params:
+        frac = 0.01,
+        seed = 5
+    shell: """
+        samtools view -s {params.seed}.{params.frac} {input} | awk -f scripts/histogram_mapq.sh > {output}
+    """

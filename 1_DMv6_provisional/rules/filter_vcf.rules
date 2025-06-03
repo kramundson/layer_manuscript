@@ -1,0 +1,14 @@
+rule filter_vcf:
+    input:
+        "data/calls/{chrom}-calls.vcf.gz"
+    output:
+        "data/calls/filter-{chrom}-calls.vcf.gz"
+    params:
+        filter_1="EPPR<=30 && RPPR <= 30 && SRP <= 30",
+        filter_2="EPP[*]<=30 && RPP[*] <= 30 && SAP[*]<=30"
+    log:
+        "log/filter/{chrom}.log"
+    shell: """
+        bcftools view -i {params.filter_1} {input} | \
+        bcftools view -i {params.filter_2} | bgzip > {output} 2> {log}
+    """

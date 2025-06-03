@@ -1,0 +1,7 @@
+rule samtools_merge_long:
+    input:
+        lambda x: ["data/aligned_long/{}.bam".format(x) for x in long_samples[x.sample]]
+    output:
+        "data/merge_long/{sample}.bam"
+    shell:
+        "samtools merge {output} {input}"

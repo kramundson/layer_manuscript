@@ -1,0 +1,9 @@
+3_annotation/data/rnaseq/*.*
+3_annotation/.snakemake
+2_assembly/data/reads/*.*
+2_assembly/.snakemake
+1_DMv6_provisional/ref/*fasta
+1_DMv6_provisional/ref/ref_windows/*
+1_DMv6_provisional/data/merged/*.*
+1_DMv6_provisional/data/reads/*.*
+1_DMv6_provisional/.snakemake
