@@ -1,0 +1,14 @@
+rule EDTA:
+    input:
+        ref=config["genome"]
+    output:
+        "{}.mod.EDTA.TElib.TEanno.gff3".format(re.sub(".fa", "", config["genome"]))
+    log:
+        "log/EDTA/EDTA.log"
+    params:
+        "--overwrite 1 --sensitive 1 --anno 1 --evaluate 1"
+    conda: "env/EDTA.yml"
+    threads: 10
+    shell: """
+        perl EDTA.pl --genome {input.ref} {params} --threads {threads} > {log} 2>&1
+    """

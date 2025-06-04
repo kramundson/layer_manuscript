@@ -1,0 +1,78 @@
+# path or URL to sequencing unit sheet (TSV format, columns: sample, unit, fq1, fq2)
+# Units are technical replicates (e.g., lanes or resequencing of the same biological
+# sample).
+units: "mapping-units.tsv"
+# units: "units.tsv"
+# units: "units_toy.tsv"
+# units: "units_test_asm.tsv"
+genome: "ref/RP_tetra_homcov140_purged.p_ctg.fasta"
+# genome: "ref/RP_tetra_purged.pa_ctg.fa"
+# genome: "ref/RP_tetra_homcov140.p_ctg.fa"
+# genome: "ref/RP_tetra.pa_ctg.fa"
+# genome: "ref/PI310467.asm.bp.p_ctg.fa"
+# genome: "ref/PI310467-hifiasm-overlap-hm.fa"
+# genome: "ref/PI310467-hifiasm-contigs-trim-overlap.fasta"
+# genome: "ref/PI310467-hifiasm.contigs.fasta"
+# genome: "ref/utg000001l.fa"
+# intervals: "ref/PI310467-hifiasm-1M.bed"
+# intervals: "ref/utg000001l-100k.bed"
+intervals: "ref/RP_tetra_homcov140_purged.p_ctg_100k.bed"
+final_samples: []
+
+# sequencing adapter
+adapter: AGATCGGAAGAGC
+
+params:
+
+    align:
+        threads: 24
+        sort_mem: 4G
+        
+    bedtools:
+        window: 100000
+        
+    prefetch:
+        ascp: "--ascp-path '/share/comailab/kramundson/.aspera/connect/bin/ascp|/home/kramundson/.aspera/connect/etc/asperaweb_id_dsa.openssh' --max-size 50000000000"
+        threads: 4
+
+    cutadapt-pe:
+        qual: "-q 10 -m 40"
+        threads: 12
+    
+    cutadapt-se:
+        qual: "-q 10 -m 40"
+        threads: 12
+    
+    mark_duplicates:
+        jarpath: "/share/comailab/kramundson/miniconda3/envs/ximena/share/picard-2.18.27-0/picard.jar"
+        java_heap: "-Xms512m -Xmx4g -XX:ParallelGCThreads=1 -Djava.io.tmpdir=."
+        opt: "REMOVE_DUPLICATES=true TMP_DIR=./tmp ASSUME_SORT_ORDER=coordinate MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000"
+        threads: 2
+    
+    gatk:
+        jvm: "-Xms512m -Xmx1g -XX:ParallelGCThreads=1 -Djava.io.tmpdir=."
+        jar: "/share/comailab/kramundson/miniconda3/envs/ximena/opt/gatk-3.8/GenomeAnalysisTK.jar"
+        threads: 2
+    
+    depth:
+        mq: 20
+        bin_size: 10000
+ 
+    clipOverlap:
+        "--poolSize 10000000"
+    
+    # freebayes: "--hwe-priors-off --min-mapping-quality 20 --min-base-quality 20 --genotype-qualities --ploidy 4 --use-best-n-alleles 6"
+    freebayes: "--hwe-priors-off --min-mapping-quality 20 --min-base-quality 20 --report-monomorphic --ploidy 4 --use-best-n-alleles 6"
+
+    pbmm2:
+        threads: 24
+        preset: "--preset CCS --sort"
+
+    # raw mpileup for running maps
+    mpup:
+        threads: 12
+    
+    # maps part 1
+    maps_part_1:
+        params:
+        threads: 12

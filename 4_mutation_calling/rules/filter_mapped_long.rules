@@ -1,0 +1,11 @@
+rule filter_map_long:
+    input:
+        "data/aligned_long/{sample}-{unit}.raw.bam"
+    output:
+        "data/aligned_long/{sample}-{unit}.bam"
+    wildcard_constraints:
+        sample="[A-Za-z0-9_]+",
+        unit="[A-Za-z0-9_:]+"
+    shell: """
+        samtools view -b -F 3840 -q 1 -o {output} {input}
+    """

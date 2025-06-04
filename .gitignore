@@ -1,3 +1,6 @@
+4_mutation_calling/ref/*.*
+4_mutation_calling/ref/ref_windows/windows*
+4_mutation_calling/data/reads/*.gz
 3_annotation/data/rnaseq/*.*
 3_annotation/.snakemake
 2_assembly/data/reads/*.*

@@ -1,0 +1,8 @@
+rule merge_dedup:
+    input:
+        lambda x: dedup_samples[x.sample]
+    output:
+        "data/merge_dedup/{sample}.bam"
+    shell: """
+        samtools merge {output} {input}
+    """

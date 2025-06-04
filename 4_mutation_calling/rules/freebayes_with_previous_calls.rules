@@ -1,0 +1,26 @@
+rule freebayes_with_previous_calls:
+    input:
+        ref=config["genome"],
+        bam=["data/merged/{}.bam".format(x) for x in units.index.levels[0]],
+        bai=["data/merged/{}.bam.bai".format(x) for x in units.index.levels[0]],
+        calls="data/calls/all-calls.vcf.gz"
+    output:
+        "data/calls-update/interval/{interval}-calls.vcf"
+    params:
+        # options="--hwe-priors-off --min-mapping-quality 41 --min-base-quality 20 --genotype-qualities --ploidy 4 --cnv-map cnv-map.bed --use-best-n-alleles 6 --report-monomorphic",
+        options=config["params"]["freebayes"],
+        # interval="chr08:54870815-54985846"
+        interval = lambda wildcards: "{}:{}-{}".format("_".join(wildcards.interval.split("_")[:-2]), wildcards.interval.split("_")[::-1][1], wildcards.interval.split("_")[::-1][0]),
+    log:
+        "log/freebayes-update/{interval}.log"
+    shell: """
+        freebayes \
+        -r {params.interval} \
+        --fasta-reference {input.ref} \
+        --bam {input.bam} \
+        --variant-input {input.calls} \
+        --only-use-input-alleles \
+        {params.options} \
+        --vcf {output} \
+        2> {log}
+"""

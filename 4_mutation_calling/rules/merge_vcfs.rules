@@ -1,0 +1,20 @@
+rule merge_vcfs:
+    input:
+        # vcfs=["data/calls/interval/{}-calls.vcf".format(re.sub("\t", "_", x)) for x in intervals],
+        # intervals=config["intervals"]
+        vcfs=["data/calls/chunk/{}-calls.vcf".format(x) for x in targets]
+    output:
+        # "data/calls/{chrom}-calls.vcf"
+        lst=temp("tmp_vcf_files.txt"),
+        vcf="data/calls/all-calls.vcf.gz"
+    params:
+        # jarpath=config["params"]["mark_duplicates"]["jarpath"],
+        # java_heap=config["params"]["mark_duplicates"]["java_heap"]
+    log:
+        "log/cat_vcfs.log"
+    # conda: "../env/bcftools.yaml"
+    shell: """
+        module load bcftools/1.12
+        echo {input.vcfs} | tr ' ' '\n' | sort > {output.lst}
+        bcftools concat --file-list {output.lst} > {output.vcf} 2> {log}
+    """

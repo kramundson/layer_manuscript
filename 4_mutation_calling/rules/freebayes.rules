@@ -1,0 +1,19 @@
+rule freebayes:
+    input:
+        ref=config["genome"],
+        bam=["data/merged/{}.bam".format(x) for x in units.index.levels[0]],
+        bai=["data/merged/{}.bam.bai".format(x) for x in units.index.levels[0]]
+    output:
+        "data/calls/all-calls.vcf"
+    params:
+        config["params"]["freebayes"]
+    log:
+        "log/freebayes/freebayes.log"
+    shell: """
+        freebayes \
+            --fasta-reference {input.ref} \
+            --bam {input.bam} \
+            --vcf {output} \
+            {params} \
+            2> {log}
+    """

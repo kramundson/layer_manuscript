@@ -1,0 +1,14 @@
+rule index_asm:
+    input:
+        config["genome"]
+    output:
+        "{}.bwt".format(config["genome"]),
+        "{}.fai".format(config["genome"]),
+        "{}.genome".format(config["genome"])
+    log:
+        "log/index_asm/index.log"
+    shell: """
+        bwa index {input} 2> {log}
+        samtools faidx {input}
+        cut -f 1-2 {output[1]} > {output[2]}
+    """

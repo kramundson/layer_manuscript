@@ -1,0 +1,23 @@
+rule freebayes_interval:
+    input:
+        ref=config["genome"],
+        # long_bam=["data/merge_long/{}.bam".format(x) for x in long.index.levels[0]],
+        # long_bai=["data/merge_long/{}.bam.bai".format(x) for x in long.index.levels[0]],
+        short_bam=["data/merged/{}.bam".format(x) for x in short.index.levels[0]],
+        short_bai=["data/merged/{}.bam.bai".format(x) for x in short.index.levels[0]],
+        target="ref/ref_windows/windows-{chunk}"
+    output:
+        "data/calls/chunk/{chunk}-calls.vcf"
+    params:
+        options=config["params"]["freebayes"]
+    log:
+        "log/freebayes/{chunk}.log"
+    shell: """
+        freebayes \
+            -t {input.target} \
+            --fasta-reference {input.ref} \
+            --bam {input.short_bam} {input.long_bam} \\
+            {params.options} \
+            > {output} \
+            2> {log}
+    """
