@@ -1,10 +1,10 @@
 # path or URL to sequencing unit sheet (TSV format, columns: sample, unit, fq1, fq2)
 # Units are technical replicates (e.g., lanes or resequencing of the same biological
 # sample).
-units: "units.tsv"
+units: "des_layer_units.tsv"
 genome: "ref/RP_tetra_homcov140_purged.p_ctg.fasta"
 intervals: "ref/RP_tetra_homcov140_purged.p_ctg_100k.bed"
-final_samples: []
+final_output: "data/calls/des_layer_variants.vcf.gz"
 
 # sequencing adapter
 adapter: AGATCGGAAGAGC
